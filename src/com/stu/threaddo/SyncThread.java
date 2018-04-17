@@ -31,5 +31,7 @@ class test{
       Thread thread2 = new Thread(syncThread2, "SyncThread2");
       thread1.start();
       thread2.start();
+
+      ThreadLocal<String> local = new ThreadLocal<String>();
    }
 }

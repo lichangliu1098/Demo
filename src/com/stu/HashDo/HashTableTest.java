@@ -1,9 +1,6 @@
 package com.stu.HashDo;
 
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class HashTableTest {
     public static void main(String[] args){
@@ -27,6 +24,7 @@ public class HashTableTest {
         set.add("生物");
         set.add("化学");
 
+        HashMap map;
 
     }
 }
