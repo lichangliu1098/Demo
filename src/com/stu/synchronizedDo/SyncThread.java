@@ -1,15 +1,19 @@
 package com.stu.synchronizedDo;
 
+import java.util.List;
+
 public class SyncThread implements Runnable{
 
     private static int count;
+
+    private List<String> list = null;
 
     public SyncThread(){
         count=0;
     }
 
     public void countAdd(){
-        synchronized (this){
+        synchronized (list){
             for (int i=0;i<5;i++){
                 try{
                     System.out.println(Thread.currentThread().getName()+ ":" + (count++));
@@ -18,7 +22,6 @@ public class SyncThread implements Runnable{
                     e.printStackTrace();
                 }
             }
-
         }
     }
 
