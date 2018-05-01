@@ -2,6 +2,8 @@ package com.stu;
 
 import com.stu.singleton.LazySingleton;
 
+import java.util.ArrayList;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -17,5 +19,9 @@ public class Main {
         for(int i=0;i<100000;i++){
             new Thread(runnable,"线程"+i).start();
         }
+
+        ArrayList<String> a = new ArrayList<String>();
     }
+
+
 }
