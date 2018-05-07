@@ -25,6 +25,5 @@ public class HashTableTest {
         set.add("化学");
 
         HashMap map;
-
     }
 }

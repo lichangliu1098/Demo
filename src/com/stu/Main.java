@@ -21,6 +21,9 @@ public class Main {
         }
 
         ArrayList<String> a = new ArrayList<String>();
+
+        int i=0;
+        int j=0;
     }
 
 
