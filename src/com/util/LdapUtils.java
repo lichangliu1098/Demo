@@ -33,11 +33,11 @@ public class LdapUtils {
     //filter ：指定子节点(格式为"(objectclass=*)",*是指全部，你也可以指定某一特定类型的树节点)
     //查询用户信息
     private static final String SEARCH_USER_BASE = "ou=ZHUYUN,dc=jiagouyun,dc=com";//Configs.getString("ldap.userbase");
-    private static final String SEARCH_USER_SCOPE = "";//Configs.getString("ldap.userscope");
+    private static String SEARCH_USER_SCOPE = "";//Configs.getString("ldap.userscope");
     private static final String SEARCH_USER_FILTER = "(|(objectClass=posixAccount)(objectClass=account))";//Configs.getString("ldap.userfilter");
     //查询组织信息
     private static final String SEARCH_ORGANIZA_BASE = "ou=ZHUYUN,dc=jiagouyun,dc=com";//Configs.getString("ldap.organizabase");
-    private static final String SEARCH_ORGANIZA_SCOPE = "";//Configs.getString("ldap.organizascope");
+    private static String SEARCH_ORGANIZA_SCOPE = "";//Configs.getString("ldap.organizascope");
     private static final String SEARCH_ORGANIZA_FILTER = "(objectClass=organizationalUnit)";//Configs.getString("ldap.organizafilter");
 
     //要返回的属性
@@ -86,7 +86,7 @@ public class LdapUtils {
             dc = new InitialLdapContext(env,null);// 初始化上下文
             //logger.info("认证成功");
         } catch (javax.naming.AuthenticationException e) {
-           /* logger.error("认证失败:"+e.getMessage());
+            /*logger.error("认证失败:"+e.getMessage());
             throw new LocaleBizServiceException("User.Ldap.AuthenticationException");*/
         } catch (Exception e) {
             /*logger.error("认证出错:"+e.getMessage());*/
@@ -107,67 +107,17 @@ public class LdapUtils {
         }
     }
 
-    public static List<String> searchOrgRelation(){
-        SearchControls sc = new SearchControls();
-        sc.setReturningAttributes(RETURN_ORGANIZED_ATTRS);
-        if(SEARCH_ORGANIZA_SCOPE.equals("one")) {
-            sc.setSearchScope (SearchControls.ONELEVEL_SCOPE);
-        }else if(SEARCH_ORGANIZA_SCOPE.equals("base")) {
-            sc.setSearchScope(SearchControls.OBJECT_SCOPE);
-        }else {
-            sc.setSearchScope (SearchControls.SUBTREE_SCOPE);
-        }
-        NamingEnumeration ne = null;
-        List<String> list = new ArrayList<>();
-        try {
-
-            ne = dc.search(new LdapName(SEARCH_ORGANIZA_BASE), SEARCH_ORGANIZA_FILTER, sc);
-            // Use the NamingEnumeration object to cycle through
-            // the result set.
-
-            while (ne.hasMore()) {
-                SearchResult sr = (SearchResult) ne.next();
-                String name = sr.getNameInNamespace();
-                System.out.println("--------------name:"+name);
-
-                String dn = name;
-                String uid = "";
-                list.add(name);
-                Attributes at = sr.getAttributes();
-                NamingEnumeration ane = at.getAll();
-                while (ane.hasMore()) {
-                    Attribute attr = (Attribute) ane.next();
-                    String attrType = attr.getID();
-                    NamingEnumeration values = attr.getAll();
-                    while (values.hasMore()) {
-                        Object oneVal = values.nextElement();
-                        if(attrType.equals("entryUUID")){
-                            uid = (String) oneVal;
-                        }
-                    }
-                }
-                organizaDN_UID.put(dn,uid);//name为组织的全路径
-            }
-        } catch (Exception nex) {
-           /* logger.error("查询ldpat组织机构层级关系错误:"+nex.getMessage());
-            throw new LocaleBizServiceException("User.Ldap.QueryOrganizaException");*/
-        }
-        System.out.println(organizaDN_UID.toString());
-        return list;
-    }
-
 
     /**
      *查询ldat服务器获取所有用户数据
      */
-    public static List<LdaptUserResult> searchInformation() {
+    public static List<LdaptUserResult> searchInformation(String base,String scope) {
 
         SearchControls sc = new SearchControls();
         sc.setReturningAttributes(RETURN_USER_ATTRS);
-        //sc.setCountLimit(1);
-        if (SEARCH_USER_SCOPE.equals("base")) {
+        if (scope.equals("base")) {
             sc.setSearchScope(SearchControls.OBJECT_SCOPE);
-        } else if (SEARCH_USER_SCOPE.equals("one")) {
+        } else if (scope.equals("one")) {
             sc.setSearchScope(SearchControls.ONELEVEL_SCOPE);
         } else {
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -176,7 +126,7 @@ public class LdapUtils {
         LdaptUserResult ldaptUserResult = null;
         List<LdaptUserResult> list = new ArrayList<LdaptUserResult>();
         try {
-            ne = dc.search(new LdapName(SEARCH_USER_BASE), SEARCH_USER_FILTER, sc);
+            ne = dc.search(new LdapName(base), SEARCH_USER_FILTER, sc);
 
             // Use the NamingEnumeration object to cycle through
             // the result set.
@@ -185,21 +135,12 @@ public class LdapUtils {
                 SearchResult sr = (SearchResult) ne.next();
 
                 String name = sr.getNameInNamespace();
-                System.out.println("======name========"+name);
-                /*ldaptUserResult.setPassword("123456");//默认密码
-                ldaptUserResult.setUserType(UserType.portal);//用户类型
+                //System.out.println("=================name=======:"+name);
+
+                ldaptUserResult.setPassword("123456");//默认密码
+                ldaptUserResult.setUserType("portal");//用户类型
                 ldaptUserResult.setFullName(name);
                 ldaptUserResult.setSourceType("LDAP");
-                ldaptUserResult.setRoleName("普通用户");
-                if(nonNull(name)&&!name.isEmpty()){
-                    String[] nameStr = name.split(",");
-                    if(nonNull(nameStr[1])&&nameStr[1].contains("ou=")){
-                        ldaptUserResult.setOrganizationId(nameStr[1].replace("ou=",""));
-                    }
-                }else{
-                    continue;
-                }*/
-
                 if(nonNull(name)&&!name.isEmpty()){
                     String[] nameStr = name.split(",");
                     if(nonNull(nameStr[1])&&nameStr[1].contains("ou=")){
@@ -207,8 +148,12 @@ public class LdapUtils {
                         for(int i=2;i<nameStr.length;i++){
                             dn = dn+","+nameStr[i];
                         }
-                        //ldaptUserResult.setOrganizationId(dn);
-                        System.out.println("========organizationId====="+dn);
+                        if(SEARCH_ORGANIZA_BASE.equals(dn)){//当前为根节点
+                            ldaptUserResult.setRoleName("系统管理员");
+                        }else{
+                            ldaptUserResult.setRoleName("普通用户");
+                        }
+                        ldaptUserResult.setOrganizationId(dn);
                     }
                 }else{
                     continue;
@@ -225,12 +170,15 @@ public class LdapUtils {
                     while (values.hasMore()) {
                         Object oneVal = values.nextElement();
                         //组装成对象
-                        //combinationUser(ldaptUserResult,attrType,oneVal);
+                        combinationUser(ldaptUserResult,attrType,oneVal);
 
                         //System.out.println(attrType+"=="+oneVal);
                     }
                 }
-                //list.add(ldaptUserResult);
+                if(isNull(ldaptUserResult.getName())){
+                    ldaptUserResult.setName(ldaptUserResult.getUsername());
+                }
+                list.add(ldaptUserResult);
             }
         } catch (Exception nex) {
             /*logger.error("查询ldpat用户数据错误:"+nex.getMessage());
@@ -241,10 +189,56 @@ public class LdapUtils {
     }
 
     /**
-     * 获取ldapt组织机构信息
+     * 查询组织机构层级
+     * @param base
+     * @param scope
      * @return
      */
-    public static  Map<String,String[]> searchOrganization(){
+    public static List<String> searchOrgBase(String base,String scope){
+        List<String> baseList = new ArrayList<>();
+        List<String> rootList = new ArrayList<>();
+        rootList.add(base);
+        searchForEach(rootList,scope,baseList);
+        return baseList;
+    }
+
+    //递归遍历
+    public static List<String> searchForEach(List<String> rootList,String scope,List<String> baseList){
+        List<String> returnList = new ArrayList<>();
+        if(rootList != null && rootList.size()>0){
+            for(String base : rootList){
+                try{
+                    SearchControls sc = new SearchControls();
+                    if (scope.equals("base")) {
+                        sc.setSearchScope(SearchControls.OBJECT_SCOPE);
+                    } else if (scope.equals("one")) {
+                        sc.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+                    } else {
+                        sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+                    }
+                    NamingEnumeration ne = dc.search(new LdapName(base), SEARCH_ORGANIZA_FILTER, sc);
+                    while (ne.hasMore()) {
+                        SearchResult sr = (SearchResult) ne.next();
+                        String name = sr.getNameInNamespace();
+                        returnList.add(name);
+                        baseList.add(name);
+                    }
+                }catch(Exception nex){
+                   /* logger.error("查询ldpat组织机构层级关系错误:"+nex.getMessage());
+                    throw new LocaleBizServiceException("User.Ldap.QueryOrganizaException");*/
+                }
+            }
+        }else{
+            return baseList;
+        }
+        return searchForEach(returnList,"one",baseList);
+    }
+
+    /**
+     * 获取ldapt组织机构dn和uid对应关系
+     * @return
+     */
+    public static Map<String,String> searchOrgDN_UID(){
         SearchControls sc = new SearchControls();
         sc.setReturningAttributes(RETURN_ORGANIZED_ATTRS);
         if(SEARCH_ORGANIZA_SCOPE.equals("one")) {
@@ -255,57 +249,108 @@ public class LdapUtils {
             sc.setSearchScope (SearchControls.SUBTREE_SCOPE);
         }
         NamingEnumeration ne = null;
-        String[] strArr = null;
-        Map<String,String[]> map = new HashMap<>();
+        Map<String,String> map = new HashMap<>();
         try {
             ne = dc.search(new LdapName(SEARCH_ORGANIZA_BASE), SEARCH_ORGANIZA_FILTER, sc);
-            // Use the NamingEnumeration object to cycle through
-            // the result set.
-
             while (ne.hasMore()) {
                 SearchResult sr = (SearchResult) ne.next();
                 String name = sr.getNameInNamespace();
 
-                String ou = null;
-                String organizaName="";
-                String uid = name;
+                String uid = "";
                 Attributes at = sr.getAttributes();
                 NamingEnumeration ane = at.getAll();
                 while (ane.hasMore()) {
                     Attribute attr = (Attribute) ane.next();
                     String attrType = attr.getID();
                     NamingEnumeration values = attr.getAll();
-                    // Another NamingEnumeration object, this time
-                    // to iterate through attribute values.
                     while (values.hasMore()) {
                         Object oneVal = values.nextElement();
 
-                        //System.out.println(attrType+"=="+oneVal);
+                        if(attrType.equals("entryUUID")){
+                            uid = (String) oneVal;
+                        }
+                    }
+                }
+                map.put(name,uid);//name为组织的全路径
+            }
+        } catch (Exception nex) {
+            nex.printStackTrace();
+            /*logger.error("查询ldpat组织机构dn和uid对应关系错误:"+nex.getMessage());
+            throw new LocaleBizServiceException("USER.Ldap.SyncOrg.Dn.Uid.Exception");*/
+        }
+
+        return map;
+    }
+
+    /**
+     * 获取ldapt组织机构信息
+     * @return
+     */
+    public static Map<String,String[]> searchOrganization(String base,String scope){
+        SearchControls sc = new SearchControls();
+        sc.setReturningAttributes(RETURN_ORGANIZED_ATTRS);
+        if(scope.equals("one")) {
+            sc.setSearchScope (SearchControls.ONELEVEL_SCOPE);
+        }else if(scope.equals("base")) {
+            sc.setSearchScope(SearchControls.OBJECT_SCOPE);
+        }else {
+            sc.setSearchScope (SearchControls.SUBTREE_SCOPE);
+        }
+        NamingEnumeration ne = null;
+        Map<String,String[]> map = new HashMap<>();
+        try {
+            ne = dc.search(new LdapName(base), SEARCH_ORGANIZA_FILTER, sc);
+
+            while (ne.hasMore()) {
+                SearchResult sr = (SearchResult) ne.next();
+                String name = sr.getNameInNamespace();
+
+                String ou = "";
+                String organizaName="";
+                String uid = "";
+                Attributes at = sr.getAttributes();
+                NamingEnumeration ane = at.getAll();
+                while (ane.hasMore()) {
+                    Attribute attr = (Attribute) ane.next();
+                    String attrType = attr.getID();
+                    NamingEnumeration values = attr.getAll();
+                    while (values.hasMore()) {
+                        Object oneVal = values.nextElement();
+
                         if(attrType.equals("ou")){
                             ou = (String) oneVal;
                         }
                         if(attrType.equals("description")){
                             organizaName = (String) oneVal;
                         }
+                        if(attrType.equals("entryUUID")){
+                            uid = (String) oneVal;
+                        }
                     }
                 }
+                if(organizaName.isEmpty()){
+                    organizaName = ou;
+                }
                 //获取用户目录数组
-                //if(nonNull(name)&&!name.isEmpty()){
-                String[] orgOuRelationArr = getOrgOuRelation(name,root);
-                System.out.println("====uid===:"+uid);
-                System.out.println("====arrOu==:"+Arrays.toString(orgOuRelationArr));
-                //map.put(uid,orgOuRelationArr);
-                //}
-                //organizaCNName.put(ou,organizaName);
+                if(nonNull(name)&&!name.isEmpty()){
+                    String[] orgOuRelationArr = getOrgOuRelation(name,root);
+                    map.put(uid,orgOuRelationArr);
+                }
+
             }
         } catch (Exception nex) {
-            nex.printStackTrace();
             /*logger.error("查询ldpat组织机构数据错误:"+nex.getMessage());
             throw new LocaleBizServiceException("User.Ldap.QueryOrganizaException");*/
         }
         return map;
     }
 
+    /**
+     * 组装当前组织的上层级关系
+     * @param name
+     * @param root
+     * @return
+     */
     private static String[] getOrgOuRelation(String name, String root) {
         name = name.lastIndexOf(root) != -1 ? name.substring(0,name.lastIndexOf(root)) : name;
         String[] tempArr = null;
@@ -333,6 +378,9 @@ public class LdapUtils {
                 case "uid":
                     ldaptUserResult.setUsername((String) oneVal);
                     break;
+                case "entryUUID":
+                    ldaptUserResult.setUid((String)oneVal);//唯一作为主键
+                    break;
                 case "mail":
                     ldaptUserResult.setEmail((String) oneVal);
                     break;
@@ -344,7 +392,8 @@ public class LdapUtils {
 
     public static void main(String[] args) {
         LdapUtils.init();
-        LdapUtils.searchOrgRelation();
+        List<LdaptUserResult> list = LdapUtils.searchInformation(SEARCH_ORGANIZA_BASE,"");
+        System.out.println(list);
         //Map<String,String[]> list = LdapUtils.searchOrganization();
         LdapUtils.close();
 

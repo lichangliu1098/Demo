@@ -24,6 +24,10 @@ public class LdaptUserResult {
 
     private String sourceType;
 
+    private String uid;
+
+    private String userType;
+
     public String getUsername() {
         return username;
     }
@@ -110,5 +114,26 @@ public class LdaptUserResult {
 
     public void setSourceType(String sourceType) {
         this.sourceType = sourceType;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    @Override
+    public String toString() {
+        return "fullName="+fullName+"----RoleName="+roleName;
     }
 }
