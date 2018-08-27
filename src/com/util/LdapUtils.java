@@ -209,6 +209,7 @@ public class LdapUtils {
             for(String base : rootList){
                 try{
                     SearchControls sc = new SearchControls();
+                    sc.setReturningAttributes(RETURN_ORGANIZED_ATTRS);
                     if (scope.equals("base")) {
                         sc.setSearchScope(SearchControls.OBJECT_SCOPE);
                     } else if (scope.equals("one")) {
@@ -222,6 +223,23 @@ public class LdapUtils {
                         String name = sr.getNameInNamespace();
                         returnList.add(name);
                         baseList.add(name);
+
+                        String uid = "";
+                        Attributes at = sr.getAttributes();
+                        NamingEnumeration ane = at.getAll();
+                        while (ane.hasMore()) {
+                            Attribute attr = (Attribute) ane.next();
+                            String attrType = attr.getID();
+                            NamingEnumeration values = attr.getAll();
+                            while (values.hasMore()) {
+                                Object oneVal = values.nextElement();
+
+                                if(attrType.equals("entryUUID")){
+                                    uid = (String) oneVal;
+                                }
+                            }
+                        }
+                        organizaDN_UID.put(name,uid);//name为组织的全路径
                     }
                 }catch(Exception nex){
                    /* logger.error("查询ldpat组织机构层级关系错误:"+nex.getMessage());
@@ -392,8 +410,9 @@ public class LdapUtils {
 
     public static void main(String[] args) {
         LdapUtils.init();
-        List<LdaptUserResult> list = LdapUtils.searchInformation(SEARCH_ORGANIZA_BASE,"");
+        List<String> list = LdapUtils.searchOrgBase(SEARCH_ORGANIZA_BASE,"base");
         System.out.println(list);
+        System.out.println(organizaDN_UID);
         //Map<String,String[]> list = LdapUtils.searchOrganization();
         LdapUtils.close();
 
