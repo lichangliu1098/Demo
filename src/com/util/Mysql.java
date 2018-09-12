@@ -5,8 +5,8 @@ import java.sql.*;
 public class Mysql {
 
 	private static final String URL="jdbc:mysql://127.0.0.1:3306/cbis_user?useUnicode=true";
-    private static final String USER="bruce";
-    private static final String PASSWORD="bruce.1234";
+    private static final String USER="root";
+    private static final String PASSWORD="123456";
 
 	 private static Connection conn=null;
 
@@ -16,7 +16,21 @@ public class Mysql {
 	             Class.forName("com.mysql.jdbc.Driver");
 	             //2.获得数据库的连接
 	             conn=DriverManager.getConnection(URL, USER, PASSWORD);
-	         } catch (ClassNotFoundException e) {
+
+				 /*Statement statement=conn.createStatement();
+				 //查询数据,其中输入sql语句
+				 ResultSet rSet=statement.executeQuery("SELECT * FROM account");
+
+				 //rSet.next()返回的是一个布尔类型的值，而且将指针指向下一条记录
+				 while(rSet.next()){
+					 *//*
+					  * 将获得的数据输入到控制台上，注意得到的方法，因为之前查询时获得的是两个值，一个string，一个int，
+					  * 使用其中的参数为string的方法，将值得名称传进去
+					  *//*
+					 System.out.println(rSet.getString("name")+","+rSet.getInt("username"));
+				 }*/
+
+		 } catch (ClassNotFoundException e) {
 	             e.printStackTrace();
 	         } catch (SQLException e) {
 	             e.printStackTrace();
