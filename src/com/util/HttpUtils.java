@@ -1,6 +1,9 @@
 package com.util;
 
 import com.github.kevinsawicki.http.HttpRequest;
+import com.google.gson.Gson;
+import com.stu.EpassUserInfo;
+import com.stu.TokenResult;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -30,41 +33,32 @@ public class HttpUtils {
     private static String response_type_value = "code";
 
 
+    public static TokenResult getEpassTokenByCode(String code){
 
-
-    public static void getEpassCode() {
-        //http://account.intertest.informac/o/authorize/?client_id=EtVErk9D3mF45x0StEajiWVYB8tOlxUX0aRZ20KJ&amp;grant_type=implicit&amp;redirect_uri=http%3A%2F%2Flocalhost%2Fredirect_uri&amp;response_type=token&amp;state=http%3A%2F%2Flocalhost%2Fredirect_uri
-
-        HttpRequest request = HttpRequest.get(codeUrl,true,client_id,client_id_value,grant_type,grant_type_value,redirect_uri,redirect_uri_value,response_type,response_type_value);
-        request.trustAllCerts();
-        request.trustAllHosts();
-        System.out.println("responseBody===="+request.body());
-    }
-
-    public static void getEpassTokenByCode(String code){
-
+        TokenResult tokenResult = null;
         Map<String,String> map = new HashMap<String,String>();
         map.put("client_id","oJYX0iHDR8mDnajbR9r13QhBLs2zUSAd533SUXnc");
         map.put("client_secret","lkGqNT2yDeF5jozpf85pahMJHD8ad8i7xQIkLe1BKpahiuQFt0xivLjzEEVegte8FWd5YoBNfSJNuokSbSTO3tcOt9VxdMDaWhouPc7EItHbLwAE3h3eHCdieNEukABU");
         map.put("grant_type","authorization_code");
         map.put("code",code);
         map.put(redirect_uri,redirect_uri_value);
-        //HttpRequest request = HttpRequest.get(url,true,client_id,client_id_value,grant_type,"implicit",redirect_uri,redirect_uri_value,"response_type","token","state",redirect_uri_value);
+
         String body = HttpRequest.post(tokenUrl)
                 .trustAllCerts()
                 .trustAllHosts()
                 .form(map)
                 .body();
-        //request.form(map);
-        //StringWriter writer = new StringWriter();
-        //request.receive(writer);
+
+        tokenResult = new Gson().fromJson(body,TokenResult.class);
         System.out.println("responseBody===="+body);
+
+        return tokenResult;
     }
 
-    public static void verifyToken(){
-
-        String token = "8HjcIo1NbEq5qrzVxsqtIkY1SaxU5k";
-        String body = HttpRequest.post(verifyTokenUrl+token)
+    public static void verifyToken(String token){
+        String body = HttpRequest.get(verifyTokenUrl+token)
+                .header("Content-Type","application/json")
+                .accept("applicaiton/json")
                 .trustAllCerts()
                 .trustAllHosts()
                 .body();
@@ -73,56 +67,44 @@ public class HttpUtils {
 
     public static void getUserInfo(String token){
 
-        String body = HttpRequest.post(getUserUrl)
-                .header("Authorization",token)
+        EpassUserInfo userInfo = new EpassUserInfo();
+        String body = HttpRequest.get(getUserUrl)
+                .header("Authorization","bearer "+token)
+                .header("Content-Type","application/json")
+                .accept("application/json")
                 .trustAllCerts()
                 .trustAllHosts()
                 .body();
-        System.out.println("verifyResposeBody======"+body);
+        userInfo = new Gson().fromJson(body,EpassUserInfo.class);
+
+        System.out.println("resposeBody======"+body);
+    }
+
+    public static void refreshToken(String token){
+        TokenResult tokenResult = null;
+        Map<String,String> map = new HashMap<String,String>();
+        map.put("client_id","oJYX0iHDR8mDnajbR9r13QhBLs2zUSAd533SUXnc");
+        map.put("client_secret","lkGqNT2yDeF5jozpf85pahMJHD8ad8i7xQIkLe1BKpahiuQFt0xivLjzEEVegte8FWd5YoBNfSJNuokSbSTO3tcOt9VxdMDaWhouPc7EItHbLwAE3h3eHCdieNEukABU");
+        map.put("grant_type","refresh_token");
+        map.put("refresh_token",token);
+        String body = HttpRequest.post(tokenUrl)
+                .trustAllCerts()
+                .trustAllHosts()
+                .form(map)
+                .body();
+
+        tokenResult = new Gson().fromJson(body,TokenResult.class);
+        System.out.println("responseBody===="+body);
     }
 
     public static void main(String[] args) {
-        //HttpUtils.getEpassTokenByCode("");
-        HttpUtils.getUserInfo("GHjJxm2DY3MJWiTtWEOoebZoJMN1LQ");
+
+        /*TokenResult tokenResult = HttpUtils.getEpassTokenByCode("gV6QY2GCHsijYL8PxdoPjLhXTsVvYq");
+        if(tokenResult.getAccess_token() != null){
+            HttpUtils.verifyToken("omKTr9ZVYtlpdBH8WOBuEKZIKPRiFZ");
+            //HttpUtils.getUserInfo(tokenResult.getAccess_token());
+        }*/
+        //HttpUtils.verifyToken("omKTr9ZVYtlpdBH8WOBuEKZIKPRiFZ");
+        getUserInfo("omKTr9ZVYtlpdBH8WOBuEKZIKPRiFZ");
     }
-
-    /*public static void httpGet(){
-        InputStream is = null;
-        BufferedReader br = null;
-        try {
-            URL url = new URL("https://202.175.27.221"); // openapi.alipay.com
-
-            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-
-            conn.setHostnameVerifier(new HttpUtils().new TrustAnyHostnameVerifier());
-
-            conn.connect();
-
-            is = conn.getInputStream();
-            br = new BufferedReader(new InputStreamReader(is));
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            try {
-                br.close();
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }*/
-
-    /*public class TrustAnyHostnameVerifier implements HostnameVerifier {
-        public boolean verify(String hostname, SSLSession session) {
-            return true;
-        }
-    }*/
-
 }
