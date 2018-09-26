@@ -15,22 +15,11 @@ import java.util.Map;
 
 public class HttpUtils {
 
-    private static String codeUrl = "https://202.175.27.221/o/authorize";
     private static String tokenUrl = "https://202.175.27.221/o/token/";
     private static String verifyTokenUrl = "https://202.175.27.221/o/token-info/";
     private static String getUserUrl = "https://202.175.27.221/o/profile/";
-    private static String client_id = "client_id";
-    private static String client_id_value = "EtVErk9D3mF45x0StEajiWVYB8tOlxUX0aRZ20KJ";
-    private static String client_secret = "client_secret";
-    private static String client_secret_value = "";
-    private static String grant_type = "grant_type";
-    private static String grant_type_value = "code";
-    private static String code = "code";
-    private static String code_value = "";
     private static String redirect_uri = "redirect_uri";
-    private static String redirect_uri_value = "http://10.100.4.73:8109/resources/request/UserModule@matchEpassUser";
-    private static String response_type ="response_type";
-    private static String response_type_value = "code";
+    private static String redirect_uri_value = "";
 
 
     public static TokenResult getEpassTokenByCode(String code){
@@ -46,11 +35,13 @@ public class HttpUtils {
         String body = HttpRequest.post(tokenUrl)
                 .trustAllCerts()
                 .trustAllHosts()
+                /*.useProxy("127.0.0.1",1080)*/
                 .form(map)
                 .body();
 
-        tokenResult = new Gson().fromJson(body,TokenResult.class);
         System.out.println("responseBody===="+body);
+        tokenResult = new Gson().fromJson(body,TokenResult.class);
+
 
         return tokenResult;
     }
@@ -65,7 +56,7 @@ public class HttpUtils {
         System.out.println("verifyResposeBody======"+body);
     }
 
-    public static void getUserInfo(String token){
+    public static EpassUserInfo getUserInfo(String token){
 
         EpassUserInfo userInfo = new EpassUserInfo();
         String body = HttpRequest.get(getUserUrl)
@@ -78,6 +69,7 @@ public class HttpUtils {
         userInfo = new Gson().fromJson(body,EpassUserInfo.class);
 
         System.out.println("resposeBody======"+body);
+        return userInfo;
     }
 
     public static void refreshToken(String token){
@@ -88,8 +80,8 @@ public class HttpUtils {
         map.put("grant_type","refresh_token");
         map.put("refresh_token",token);
         String body = HttpRequest.post(tokenUrl)
-                .trustAllCerts()
-                .trustAllHosts()
+               /* .trustAllCerts()
+                .trustAllHosts()*/
                 .form(map)
                 .body();
 
@@ -98,13 +90,23 @@ public class HttpUtils {
     }
 
     public static void main(String[] args) {
-
-        /*TokenResult tokenResult = HttpUtils.getEpassTokenByCode("gV6QY2GCHsijYL8PxdoPjLhXTsVvYq");
-        if(tokenResult.getAccess_token() != null){
-            HttpUtils.verifyToken("omKTr9ZVYtlpdBH8WOBuEKZIKPRiFZ");
-            //HttpUtils.getUserInfo(tokenResult.getAccess_token());
-        }*/
+        //EpassUserInfo epassUserInfo = new EpassUserInfo();
+        //TokenResult tokenResult = HttpUtils.getEpassTokenByCode("lPlWjwNeMO7zQZf6Tp2Ht7Gh2HW9Cj");
+        //if(tokenResult.getAccess_token() != null){
+          //  epassUserInfo = HttpUtils.getUserInfo("O9lsJspCzSn93uTkobxI6pjMjhtPld");
+        //}
         //HttpUtils.verifyToken("omKTr9ZVYtlpdBH8WOBuEKZIKPRiFZ");
-        getUserInfo("omKTr9ZVYtlpdBH8WOBuEKZIKPRiFZ");
+        /*EpassUserInfo epassUserInfo = getUserInfo("fGpeqOpXvrvH06p1J8xXNXfwvSGbgE");*/
+        //System.out.println(epassUserInfo);
+
+        Map<String,String> map = new HashMap<String,String>();
+        map.put("client_id","oJYX0iHDR8mDnajbR9r13QhBLs2zUSAd533SUXnc");
+        map.put("client_secret","lkGqNT2yDeF5jozpf85pahMJHD8ad8i7xQIkLe1BKpahiuQFt0xivLjzEEVegte8FWd5YoBNfSJNuokSbSTO3tcOt9VxdMDaWhouPc7EItHbLwAE3h3eHCdieNEukABU");
+        map.put("grant_type","authorization_code");
+        map.put("code","code");
+        map.put(redirect_uri,redirect_uri_value);
+
+        //System.out.println(new Gson().toJson(map));
+        getEpassTokenByCode("zyyaBW1LQHyLwQpZL0MDb930qmJkSF");
     }
 }
