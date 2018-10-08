@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpUtils {
+public class HttpRequestUtils {
 
     private static String tokenUrl = "https://202.175.27.221/o/token/";
     private static String verifyTokenUrl = "https://202.175.27.221/o/token-info/";
@@ -91,22 +91,25 @@ public class HttpUtils {
 
     public static void main(String[] args) {
         //EpassUserInfo epassUserInfo = new EpassUserInfo();
-        //TokenResult tokenResult = HttpUtils.getEpassTokenByCode("lPlWjwNeMO7zQZf6Tp2Ht7Gh2HW9Cj");
+        //TokenResult tokenResult = HttpRequestUtils.getEpassTokenByCode("lPlWjwNeMO7zQZf6Tp2Ht7Gh2HW9Cj");
         //if(tokenResult.getAccess_token() != null){
-          //  epassUserInfo = HttpUtils.getUserInfo("O9lsJspCzSn93uTkobxI6pjMjhtPld");
+          //  epassUserInfo = HttpRequestUtils.getUserInfo("O9lsJspCzSn93uTkobxI6pjMjhtPld");
         //}
-        //HttpUtils.verifyToken("omKTr9ZVYtlpdBH8WOBuEKZIKPRiFZ");
+        //HttpRequestUtils.verifyToken("omKTr9ZVYtlpdBH8WOBuEKZIKPRiFZ");
         /*EpassUserInfo epassUserInfo = getUserInfo("fGpeqOpXvrvH06p1J8xXNXfwvSGbgE");*/
         //System.out.println(epassUserInfo);
 
-        Map<String,String> map = new HashMap<String,String>();
+        /*Map<String,String> map = new HashMap<String,String>();
         map.put("client_id","oJYX0iHDR8mDnajbR9r13QhBLs2zUSAd533SUXnc");
         map.put("client_secret","lkGqNT2yDeF5jozpf85pahMJHD8ad8i7xQIkLe1BKpahiuQFt0xivLjzEEVegte8FWd5YoBNfSJNuokSbSTO3tcOt9VxdMDaWhouPc7EItHbLwAE3h3eHCdieNEukABU");
         map.put("grant_type","authorization_code");
         map.put("code","code");
-        map.put(redirect_uri,redirect_uri_value);
+        map.put(redirect_uri,redirect_uri_value);*/
 
         //System.out.println(new Gson().toJson(map));
-        getEpassTokenByCode("zyyaBW1LQHyLwQpZL0MDb930qmJkSF");
+        //getEpassTokenByCode("zyyaBW1LQHyLwQpZL0MDb930qmJkSF");
+        String url = "https://172.17.17.254:20110/aopoauth/oauth/authorize?app_id=501563&response_type=code&redirect_uri=http://www.baidu.com";
+        HttpRequest.get(url).trustAllHosts().trustAllCerts().useProxy("localhost",1081).proxyBasic("root","cbis123!@#");
+
     }
 }

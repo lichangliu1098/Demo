@@ -99,6 +99,7 @@ public class HttpClientUtils {
                     .setConnectionManagerShared(true)
                     .build();
         } catch (Exception e) {
+            e.printStackTrace();
             //sysLogger.error("HttpClientUtils.init error message=========="+e.getMessage());
         }
     }
@@ -115,10 +116,10 @@ public class HttpClientUtils {
     public static String get(String url,Map<String,String> headersMap,String encoding) throws ParseException, IOException{
         String body = "";
 
-        // socks代理地址
-        /*InetSocketAddress socksaddr = new InetSocketAddress("127.0.0.1", 1234);
+         //socks代理地址
+        InetSocketAddress socksaddr = new InetSocketAddress("127.0.0.1", 1081);
         HttpClientContext context = HttpClientContext.create();
-        context.setAttribute("socks.address", socksaddr);*/
+        context.setAttribute("socks.address", socksaddr);
 
         if(encoding ==null || encoding.equals("")){
             encoding = "utf-8";
@@ -140,10 +141,10 @@ public class HttpClientUtils {
         }
 
         //执行请求操作，并拿到结果（同步阻塞）
-        CloseableHttpResponse response = httpClient.execute(httpGet);
+        //CloseableHttpResponse response = httpClient.execute(httpGet);
 
         //socket代理执行
-        //CloseableHttpResponse response = httpClient.execute(httpGet,context);
+        CloseableHttpResponse response = httpClient.execute(httpGet,context);
 
         //获取结果实体
         HttpEntity entity = response.getEntity();
@@ -274,5 +275,13 @@ public class HttpClientUtils {
         //init();
         //getEpassTokenByCode("LNm8K0D6l31DTmO9zNSJyrQyXWL0dP");
         //getEPassUserInfo("db3TW4AU4Ey8WyuWFjs4f1qxZcGzys");
+        //String url = "http://133.160.93.56:20200/aopoauth/oauth/authorize?app_id=501563&response_type=code&redirect_uri=http://www.baidu.com";
+        String url = "https://172.17.17.254:20110/aopoauth/oauth/authorize?app_id=501563&response_type=code&redirect_uri=http://www.baidu.com";
+        try {
+            init();
+            get(url,null,null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
