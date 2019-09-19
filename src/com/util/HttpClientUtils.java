@@ -1,3 +1,4 @@
+/*
 package com.util;
 
 import com.google.gson.Gson;
@@ -64,11 +65,13 @@ public class HttpClientUtils {
         client_secret_value ="lkGqNT2yDeF5jozpf85pahMJHD8ad8i7xQIkLe1BKpahiuQFt0xivLjzEEVegte8FWd5YoBNfSJNuokSbSTO3tcOt9VxdMDaWhouPc7EItHbLwAE3h3eHCdieNEukABU";
         redirect_uri_value ="";
 
-       /* url = Configs.getString("epass.url");
+       */
+/* url = Configs.getString("epass.url");
         header_host = Configs.getString("epass.host");
         client_id_value = Configs.getString("epass.client_id");;
         client_secret_value = Configs.getString("epass.client_secret");
-        redirect_uri_value = Configs.getString("epass.redirect_uri");*/
+        redirect_uri_value = Configs.getString("epass.redirect_uri");*//*
+
 
         tokenUrl = url+"/o/token/";
         verifyTokenUrl = url+"/o/token-info/";
@@ -104,7 +107,8 @@ public class HttpClientUtils {
         }
     }
 
-    /**
+    */
+/**
      * 模拟请求
      *
      * @param url        资源地址
@@ -112,7 +116,8 @@ public class HttpClientUtils {
      * @return
      * @throws ParseException
      * @throws IOException
-     */
+     *//*
+
     public static String get(String url,Map<String,String> headersMap,String encoding) throws ParseException, IOException{
         String body = "";
 
@@ -159,7 +164,8 @@ public class HttpClientUtils {
     }
 
 
-    /**
+    */
+/**
      * 模拟请求
      *
      * @param url        资源地址
@@ -167,14 +173,17 @@ public class HttpClientUtils {
      * @return
      * @throws ParseException
      * @throws IOException
-     */
+     *//*
+
     public static String post(String url, Map<String,String> map,Map<String,String> headersMap, String encoding) throws ParseException, IOException{
 
         String body = "";
         // socks代理地址
-        /*InetSocketAddress socksaddr = new InetSocketAddress("127.0.0.1", 1234);
+        */
+/*InetSocketAddress socksaddr = new InetSocketAddress("127.0.0.1", 1234);
         HttpClientContext context = HttpClientContext.create();
-        context.setAttribute("socks.address", socksaddr);*/
+        context.setAttribute("socks.address", socksaddr);*//*
+
 
         if(encoding ==null || encoding.equals("")){
             encoding = "utf-8";
@@ -221,11 +230,13 @@ public class HttpClientUtils {
         return body;
     }
 
-    /**
+    */
+/**
      * 根据code获取epass Token
      * @param code
      * @return
-     */
+     *//*
+
     public static EpassTokenResult getEpassTokenByCode(String code){
         EpassTokenResult epassTokenResult = null;
         Map<String,String> paramsMap = new HashMap<String,String>();
@@ -249,11 +260,13 @@ public class HttpClientUtils {
         return epassTokenResult;
     }
 
-    /**
+    */
+/**
      * 根据token获取epass用户信息
      * @param token
      * @return
-     */
+     *//*
+
     public static EpassUserInfo getEPassUserInfo(String token){
         EpassUserInfo epassUserInfo = null;
         Map<String,String> headersMap = new HashMap<String,String>();
@@ -284,4 +297,4 @@ public class HttpClientUtils {
             e.printStackTrace();
         }
     }
-}
+}*/

@@ -3,6 +3,7 @@ package com.stu;
 import com.stu.singleton.LazySingleton;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        List<String> list = new ArrayList<String>();
+        /*List<String> list = new ArrayList<String>();
         list.add("1");
         list.add("2");
         list.add("3");
@@ -21,8 +22,12 @@ public class Main {
         list.removeAll(removeList);
 
         assert function(9) == 0 :"error";
-        System.out.println(function(9));
+        System.out.println(function(9));*/
 
+        LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+
+        params.put("Pootocols",new String[]{"http","https"});
+        System.out.println("params====="+params.toString());
 
     }
 

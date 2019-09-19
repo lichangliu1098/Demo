@@ -1,19 +1,20 @@
 package com.util;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 public class Mysql {
 
-	private static final String URL="jdbc:mysql://127.0.0.1:3306/cbis_user?useUnicode=true";
-    private static final String USER="root";
-    private static final String PASSWORD="123456";
+	private static final String URL="jdbc:mysql://172.16.29.128:3306/cbis_misc?useUnicode=true";
+    private static final String USER="cbis";
+    private static final String PASSWORD="zy#CBIS@2";
 
 	 private static Connection conn=null;
 
 	 static {
 	     try {
 	             //1.加载驱动程序
-	             Class.forName("com.mysql.jdbc.Driver");
+	             Class.forName("com.mysql.cj.jdbc.Driver");
 	             //2.获得数据库的连接
 	             conn=DriverManager.getConnection(URL, USER, PASSWORD);
 
@@ -29,7 +30,7 @@ public class Mysql {
 					  *//*
 					 System.out.println(rSet.getString("name")+","+rSet.getInt("username"));
 				 }*/
-
+			 System.out.println("end======");
 		 } catch (ClassNotFoundException e) {
 	             e.printStackTrace();
 	         } catch (SQLException e) {
@@ -42,7 +43,12 @@ public class Mysql {
 	}
 
 	public static void main(String[] args) {
-		Mysql.getConnection();
+		/*System.setProperty("socksProxySet", "true");
+		System.setProperty("socksProxyHost", "localhost");
+		System.setProperty("socksProxyPort", "3081");
+		Mysql.getConnection();*/
+
+
 	}
  
 }
